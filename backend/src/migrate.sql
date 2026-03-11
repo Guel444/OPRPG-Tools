@@ -35,7 +35,7 @@ ALTER TABLE creatures
 -- Corrigir CHECK de creature_type para aceitar novos valores
 ALTER TABLE creatures DROP CONSTRAINT IF EXISTS creatures_creature_type_check;
 ALTER TABLE creatures ADD CONSTRAINT creatures_creature_type_check
-  CHECK (creature_type IN ('criatura','animal','pessoa','ameaça','humanoide','morto-vivo'));
+  CHECK (creature_type IN ('criatura','animal','pessoa','ameaça','humanoide','morto-vivo','relíquia'));
 
 -- Corrigir CHECK de size para aceitar 'média' (variante feminina)
 ALTER TABLE creatures DROP CONSTRAINT IF EXISTS creatures_size_check;
@@ -45,7 +45,8 @@ ALTER TABLE creatures ADD CONSTRAINT creatures_size_check
 -- ── RITUALS — colunas que o seed usa ─────────────────────────
 ALTER TABLE rituals
   ADD COLUMN IF NOT EXISTS disciple_effect   TEXT,
-  ADD COLUMN IF NOT EXISTS true_name_effect  TEXT;
+  ADD COLUMN IF NOT EXISTS true_name_effect  TEXT,
+  ADD COLUMN IF NOT EXISTS area              TEXT;
 
 -- ── ORIGINS — coluna power_name que o seed usa ───────────────
 ALTER TABLE origins
@@ -79,3 +80,10 @@ ALTER TABLE powers ALTER COLUMN prerequisites TYPE TEXT USING prerequisites::tex
 -- special_rules nos itens é JSONB no schema mas o seed passa texto descritivo
 -- Converter para TEXT
 ALTER TABLE items ALTER COLUMN special_rules TYPE TEXT USING special_rules::text;
+
+-- ── CREATURES — resistances/vulnerabilities/immunities são JSONB no schema
+-- mas o seed passa texto descritivo ('Balístico, corte...')
+-- Converter para TEXT
+ALTER TABLE creatures ALTER COLUMN resistances TYPE TEXT USING resistances::text;
+ALTER TABLE creatures ALTER COLUMN vulnerabilities TYPE TEXT USING vulnerabilities::text;
+ALTER TABLE creatures ALTER COLUMN immunities TYPE TEXT USING immunities::text;
