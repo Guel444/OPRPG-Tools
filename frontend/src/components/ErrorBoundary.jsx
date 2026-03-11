@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Home } from 'lucide-react';
+import { TriangleAlert as AlertTriangle, Hop as Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export class ErrorBoundary extends React.Component {

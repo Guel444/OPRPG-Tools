@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNotification } from '../../stores/notificationStore';
-import { AlertCircle, CheckCircle, AlertTriangle, X } from 'lucide-react';
+import { CircleAlert as AlertCircle, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, X } from 'lucide-react';
 
 export function NotificationContainer() {
   const { notifications, remove } = useNotification();

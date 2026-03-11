@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter } from 'lucide-react';
+import { Search, ListFilter as Filter } from 'lucide-react';
 import { useCatalog, usePagination } from '../hooks';
 import { fuzzySearch } from '../utils/fuzzySearch';
 import { ElementBadge, VDBadge, Input, Select, EmptyState, Spinner, Card, Pagination } from '../components/ui';
