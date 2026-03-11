@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { useNotification } from '../stores/notificationStore';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
@@ -50,6 +51,7 @@ export function useCharacters() {
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const notify = useNotification();
 
   const fetch = useCallback(async () => {
     setLoading(true);
@@ -57,32 +59,83 @@ export function useCharacters() {
       const { data } = await axios.get(`${API}/characters`);
       setCharacters(data);
     } catch (err) {
-      setError(err.response?.data?.error || 'Erro ao buscar fichas');
+      const errorMsg = err.response?.data?.error || 'Erro ao buscar fichas';
+      setError(errorMsg);
+      notify.error(errorMsg);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [notify]);
 
   useEffect(() => { fetch(); }, [fetch]);
 
   const createCharacter = async (charData) => {
-    const { data } = await axios.post(`${API}/characters`, charData);
-    setCharacters(prev => [data, ...prev]);
-    return data;
+    try {
+      const { data } = await axios.post(`${API}/characters`, charData);
+      setCharacters(prev => [data, ...prev]);
+      notify.success('Ficha criada com sucesso!');
+      return data;
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || 'Erro ao criar ficha';
+      notify.error(errorMsg);
+      throw err;
+    }
   };
 
   const updateCharacter = async (id, updates) => {
-    const { data } = await axios.put(`${API}/characters/${id}`, updates);
-    setCharacters(prev => prev.map(c => c.id === id ? data : c));
-    return data;
+    try {
+      const { data } = await axios.put(`${API}/characters/${id}`, updates);
+      setCharacters(prev => prev.map(c => c.id === id ? data : c));
+      notify.success('Ficha atualizada!');
+      return data;
+    } catch (err) {
+      const errorMsg = err.response?.data?.details?.[0]?.message || err.response?.data?.error || 'Erro ao atualizar ficha';
+      notify.error(errorMsg);
+      throw err;
+    }
   };
 
   const deleteCharacter = async (id) => {
-    await axios.delete(`${API}/characters/${id}`);
-    setCharacters(prev => prev.filter(c => c.id !== id));
+    try {
+      await axios.delete(`${API}/characters/${id}`);
+      setCharacters(prev => prev.filter(c => c.id !== id));
+      notify.success('Ficha deletada!');
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || 'Erro ao deletar ficha';
+      notify.error(errorMsg);
+      throw err;
+    }
   };
 
   return { characters, loading, error, createCharacter, updateCharacter, deleteCharacter, refetch: fetch };
+}
+
+export function usePagination(items, itemsPerPage = 10) {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(items.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = items.slice(startIndex, endIndex);
+
+  const goToPage = (page) => {
+    const pageNum = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(pageNum);
+  };
+
+  const nextPage = () => goToPage(currentPage + 1);
+  const prevPage = () => goToPage(currentPage - 1);
+
+  return {
+    currentPage,
+    totalPages,
+    currentItems,
+    goToPage,
+    nextPage,
+    prevPage,
+    isFirstPage: currentPage === 1,
+    isLastPage: currentPage === totalPages,
+  };
 }
 
 // Converte NEX% para número de "estágios" (5%=1, 10%=2, ..., 95%=19, 99%=20)

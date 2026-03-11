@@ -3,7 +3,7 @@ import React from 'react';
 /* ============================================================
    BOTÃO
    ============================================================ */
-export function Button({ children, variant = 'primary', size = 'md', disabled, loading, onClick, type = 'button', className = '' }) {
+export function Button({ children, variant = 'primary', size = 'md', disabled, loading, onClick, type = 'button', className = '', title, 'aria-label': ariaLabel }) {
   const base = `
     inline-flex items-center justify-center gap-2 font-display tracking-wider uppercase
     transition-all duration-200 cursor-pointer border select-none
@@ -45,6 +45,8 @@ export function Button({ children, variant = 'primary', size = 'md', disabled, l
       type={type}
       disabled={disabled || loading}
       onClick={onClick}
+      title={title}
+      aria-label={ariaLabel}
       className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
       style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.08em' }}
     >
@@ -263,11 +265,44 @@ export function Tooltip({ children, tip }) {
    ============================================================ */
 export function EmptyState({ icon, title, description, action }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-8 text-center">
-      {icon && <div className="text-stone-600 mb-4">{icon}</div>}
+    <div className="flex flex-col items-center justify-center py-16 px-8 text-center" role="status" aria-live="polite">
+      {icon && <div className="text-stone-600 mb-4" aria-hidden="true">{icon}</div>}
       <h3 className="text-stone-400 text-lg mb-2" style={{ fontFamily: 'var(--font-display)' }}>{title}</h3>
       {description && <p className="text-stone-600 text-sm max-w-sm mb-4">{description}</p>}
       {action}
+    </div>
+  );
+}
+
+/* ============================================================
+   PAGINAÇÃO
+   ============================================================ */
+export function Pagination({ currentPage, totalPages, onPageChange, disabled = false }) {
+  return (
+    <div className="flex items-center justify-center gap-2 py-4" role="navigation" aria-label="Paginação">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={disabled || currentPage === 1}
+        aria-label="Página anterior"
+        title="Página anterior"
+      >
+        ←
+      </Button>
+      <span className="text-sm text-stone-400 px-3" aria-current="page">
+        Página {currentPage} de {totalPages}
+      </span>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={disabled || currentPage === totalPages}
+        aria-label="Próxima página"
+        title="Próxima página"
+      >
+        →
+      </Button>
     </div>
   );
 }

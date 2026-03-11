@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppLayout } from './components/layout/AppLayout';
 import { Spinner } from './components/ui';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { NotificationContainer } from './components/notifications/NotificationContainer';
 import './styles/globals.css';
 
 // Lazy loading de todas as páginas
@@ -88,10 +90,13 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRoutes />
+          <NotificationContainer />
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }

@@ -2,6 +2,7 @@ const express = require('express');
 const { pool } = require('../config/db');
 const { auth, optionalAuth } = require('../middleware/auth');
 const crypto = require('crypto');
+const { characterValidators, validateRequest } = require('../validators/characterValidators');
 
 const router = express.Router();
 
@@ -35,7 +36,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
 });
 
 // POST /api/characters — criar nova ficha
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, characterValidators, validateRequest, async (req, res) => {
   const {
     name, class: cls, nex, origin, subclass, player_name,
     agi = 1, for_ = 1, int_ = 1, pre = 1, vig = 1,
@@ -94,7 +95,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // PUT /api/characters/:id — atualizar ficha
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, characterValidators, validateRequest, async (req, res) => {
   const charResult = await pool.query('SELECT user_id FROM characters WHERE id = $1', [req.params.id]);
   if (charResult.rows.length === 0) return res.status(404).json({ error: 'Ficha não encontrada' });
   if (charResult.rows[0].user_id !== req.user.id) return res.status(403).json({ error: 'Acesso negado' });
