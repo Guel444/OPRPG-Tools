@@ -1,0 +1,16 @@
+{
+  "forwardPorts": [3000, 3001],
+  "portsAttributes": {
+    "3000": {
+      "label": "Frontend",
+      "onAutoForward": "openBrowser",
+      "visibility": "public"
+    },
+    "3001": {
+      "label": "Backend API",
+      "onAutoForward": "silent",
+      "visibility": "public"
+    }
+  },
+  "postStartCommand": "gh codespace ports visibility 3000:public 3001:public -c $CODESPACE_NAME 2>/dev/null || true"
+}
